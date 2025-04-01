@@ -29,12 +29,12 @@ const ScheduleSchema = new mongoose.Schema({
 const Schedule = mongoose.model('Schedule', ScheduleSchema);
 
 // API 라우트 설정
-app.get('/user', (req, res) => {
-    res.send('마이페이지 정보 조회');
-});
-
 app.get('/home', (req, res) => {
     res.send('메인페이지');
+});
+
+app.get('/user', (req, res) => {
+    res.send('마이페이지 정보 조회');
 });
 
 app.post('/message', (req, res) => {
