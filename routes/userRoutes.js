@@ -1,12 +1,15 @@
 const express = require('express');
-const router = express.Router();
 const User = require('../models/User');
+const authMiddleware = require('../middleware/authMiddleware');
 
-router.get('/user', async (req, res) => {
+const router = express.Router();
+
+// 로그인 성공한 유저 정보 조회 (토큰 필요)
+router.get('/user', authMiddleware, async (req, res) => {
     try {
-        const users = await User.find();
-        // res.json(users);
-        res.send('마이페이지 정보 조회');
+        const user = await User.findById(req.user.userId).select('-password'); // 비밀번호 제외
+        if (!user) return res.status(404).json({ error: '유저를 찾을 수 없습니다.' });
+        res.json(user);
     } catch (err) {
         res.status(500).json({ error: '서버 오류' });
     }
