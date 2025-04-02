@@ -41,7 +41,9 @@ router.post('/login', async (req, res) => {
 
         // JWT 토큰 생성
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        res.json({ message: '로그인 성공', token });
+        // res.json({ message: '로그인 성공', token });
+        res.setHeader('Authorization', `Bearer ${token}`);
+        res.status(200).json({ message: '로그인 성공!' });
     } catch (err) {
         res.status(500).json({ error: '서버 오류' });
     }
