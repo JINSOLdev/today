@@ -15,6 +15,7 @@ app.use(express.json());
 app.use('/', require('./routes/userRoutes'));
 app.use('/', require('./routes/scheduleRoutes'));
 app.use('/', require('./routes/messageRoutes'));
+app.use('/api/auth', require('./routes/authRoutes'))
 
 // 서버 실행
 const PORT = process.env.PORT || 5000;
