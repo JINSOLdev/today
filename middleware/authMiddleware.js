@@ -1,20 +1,28 @@
 const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv')
+const dotenv = require('dotenv');
 
-dotenv.config()
+dotenv.config();
 
-module.exports = function (req, res, next) {
-    const token = req.header('Authorization');
+const authMiddleware = (req, res, next) => {
+    const token = req.header('Authorization')?.split(' ')[1];
 
-    // 톼큰이 없으면 요청 거부
-    if (!token) return res.status(401).json({ error: '토큰이 없습니다. 인증이 필요합니다.' });
+    if (!token) {
+        return res.status(401).json({ message: '인증이 필요합니다.' });
+    }
 
     try {
-        // "Bearer <token>" 형태이므로 "Bearer" 부분을 제거
-        const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET);
-        req.user = decoded; // 요청 객체에 user 정보 저장
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log('🔍 Decoded JWT:', decoded);
+        req.user = decoded;
+
+        if (!req.user?.userId) {
+            return res.status(401).json({ message: '유효하지 않은 사용자 정보 입니다.' });
+        }
         next();
-    } catch (err) {
-        res.status(401).json({ error: '유효하지 않은 토큰입니다.' });
+    } catch (error) {
+        console.log('JWT 인증 오류:', error);
+        return res.status(401).json({ message: '유효하지 않은 토큰 입니다.' });
     }
 };
+
+module.exports = authMiddleware;

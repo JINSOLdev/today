@@ -7,20 +7,26 @@ const router = express.Router();
 // 약속 생성 API
 router.post('/', authMiddleware, async (req, res) => {
     try {
-        const { title, datetime, location, participants } = req.body;
-        const userId = req.user.id; // JWT에서 가져온 유저 아이디
+        const { datetime, location } = req.body;
+        const userId = req.user?.userId; // JWT에서 가져온 유저 아이디
+        // console.log(userId);
+
+        // userId 없을 경우 에러 반환
+        if (!userId) {
+            return res.status(401).json({ message: '인증된 사용자만 약속을 생성할 수 있습니다.' });
+        }
 
         // 필수 데이터 확인
-        if (!title || !datetime || !location || !participants.length) {
-            return res.status(400).json({ message: '모든 필드를 입력해주세요.' });
+        if (!datetime || !location) {
+            return res.status(400).json({ message: '날짜와 위치를 입력해주세요요.' });
         }
 
         // 새 약속 생성
         const newEvent = new Event({
-            title,
+            title: '오늘이야',
             datetime,
             location,
-            participants,
+            participants: [userId], // 생성자를 자동으로 추가가
             createdBy: userId,
         });
 
