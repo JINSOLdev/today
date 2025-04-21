@@ -15,4 +15,18 @@ router.get('/user', authMiddleware, async (req, res) => {
     }
 });
 
+// 초대 목록 조회 API
+router.get('/:userId/invitations', async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        const user = await User.findById(userId).populate('invitations');
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        res.json(user.invitations);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
 module.exports = router;
