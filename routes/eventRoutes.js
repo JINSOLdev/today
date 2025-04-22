@@ -66,6 +66,22 @@ router.get('/my-events/created', authMiddleware, async (req, res) => {
     }
 });
 
+// 초대받은 약속 조회
+router.get('/my-events/invited', authMiddleware, async (req, res) => {
+    const userId = req.user?.userId;
+    if (!userId) return res.status(400).json({ message: 'userId가 필요합니다.' });
+
+    try {
+        const invitedEvents = await Event.find({
+            'participants.user': userId,
+            createdBy: { $ne: userId }, // 내가 만든 약속은 제외
+        }).sort({ datetime: -1 });
+        res.json(invitedEvents);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // 내가 수락한 약속 조회
 router.get('/my-events/accepted', authMiddleware, async (req, res) => {
     const userId = req.user?.userId;
